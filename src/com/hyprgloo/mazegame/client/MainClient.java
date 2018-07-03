@@ -17,6 +17,7 @@ public class MainClient extends HvlTemplateDClient2D{
 
 	@Override
 	public void update(float deltaArg){
+		Game;
 		
 	}
 
