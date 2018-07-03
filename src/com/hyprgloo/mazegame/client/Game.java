@@ -6,7 +6,6 @@ public class Game {
 
 	public Game() {
 		player = new Player(500, 500);
-		player.draw(delta);
 		
 	}
 
