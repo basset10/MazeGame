@@ -8,7 +8,9 @@ import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 
 import com.hyprgloo.mazegame.KC;
+import com.hyprgloo.mazegame.server.UserData;
 import com.osreboot.hvol.base.HvlConnectorClient;
+import com.osreboot.ridhvl.HvlMath;
 import com.osreboot.ridhvl.action.HvlAction1;
 import com.osreboot.ridhvl.menu.HvlComponentDefault;
 import com.osreboot.ridhvl.menu.HvlMenu;
@@ -22,8 +24,9 @@ import com.osreboot.ridhvl.menu.component.collection.HvlLabeledButton;
 
 public class Menu {
 
-	public static HvlMenu main, game;
+	public static HvlMenu main, lobby;
 	public static String username = "GenericUsername";
+	public static Boolean ready = false;
 
 	public static void initialize(){
 		HvlComponentDefault.setDefault(new HvlArrangerBox(Display.getWidth(), Display.getHeight(), HvlArrangerBox.ArrangementStyle.VERTICAL));
@@ -81,8 +84,14 @@ public class Menu {
 			}
 		}).build());
 
-		game = new HvlMenu();
-		game.add(new HvlArrangerBox.Builder().build());
+		lobby = new HvlMenu();
+		lobby.add(new HvlArrangerBox.Builder().build());
+		lobby.getFirstArrangerBox().add(new HvlLabeledButton.Builder().setText("ready").setClickedCommand(new HvlAction1<HvlButton>(){
+			@Override
+			public void run(HvlButton aArg){
+				ready = !ready;
+			}
+		}).build());
 
 		HvlMenu.setCurrent(main);
 	}
@@ -94,17 +103,24 @@ public class Menu {
 		username = main.getFirstArrangerBox().getFirstOfType(HvlTextBox.class).getText();
 		if(HvlMenu.getCurrent() == main){
 			if(MainClient.getNewestInstance().isAuthenticated()){
-				client.setValue(KC.key_Username(MainClient.getNewestInstance().getUIDK()), main.getFirstArrangerBox().getFirstOfType(HvlTextBox.class).getText(), false);
-				HvlMenu.setCurrent(game);
+				ready = false;
+				client.setValue(KC.key_UIDUsername(MainClient.getNewestInstance().getUIDK()), username, false);
+				client.setValue(KC.key_UIDColor(MainClient.getNewestInstance().getUIDK()), username.equals("os_reboot") ? Color.blue : Color.white, false);
+				client.setValue(KC.key_UIDReady(MainClient.getNewestInstance().getUIDK()), false, false);
+				HvlMenu.setCurrent(lobby);
 			}
-		}else if(HvlMenu.getCurrent() == game){
-			String users = "";
+		}else if(HvlMenu.getCurrent() == lobby){
+			MainClient.font.drawWord("Users:", 16, 256, Color.white);
+			float line = 0;
+			client.setValue(KC.key_UIDReady(MainClient.getNewestInstance().getUIDK()), ready, false);
+			client.setValue(KC.key_UIDColor(MainClient.getNewestInstance().getUIDK()), 
+					username.equalsIgnoreCase("os_reboot") ? new Color(0f, 0f, HvlMath.map((float)Math.sin(5f * MainClient.getNewestInstance().getTimer().getTotalTime()), -1f, 1f, 0.5f, 1f)) : Color.white, 
+							false);
 			if(client.getTable().getPopulation(KC.key_Userlist()) > 0){
-				for(String s : client.<ArrayList<String>>getValue(KC.key_Userlist())){
-					users += "\n" + s;
+				for(UserData u : client.<ArrayList<UserData>>getValue(KC.key_Userlist())){
+					MainClient.font.drawWord("[" + (u.ready ? "X" : " ") + "] " + u.name, 16, 256 + (++line * 48), u.color);
 				}
 			}
-			MainClient.font.drawWordc("Users:" + users, Display.getWidth()/2, Display.getHeight()/2, Color.white);
 		}
 		HvlMenu.updateMenus(delta);
 	}

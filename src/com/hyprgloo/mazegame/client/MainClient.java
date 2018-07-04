@@ -34,7 +34,12 @@ public class MainClient extends HvlTemplateDClient2D{
 	@Override
 	public void update(float delta){
 		Menu.update(delta);
-		if(DEBUG) font.drawWord(getNewestInstance().getClient().getTable().toString(), 0, 0, Color.white);
+		if(DEBUG) font.drawWord(getNewestInstance().getClient().getTable().toString(), 0, 0, new Color(1f, 1f, 1f, 0.2f), 0.5f);
+	}
+	
+	@Override
+	public void onConnection(){
+		
 	}
 
 	@Override
