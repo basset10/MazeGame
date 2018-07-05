@@ -14,7 +14,7 @@ public class Main {
 	INFO_PORT = 25565;
 	
 	public static void main(String[] args) {
-		//new MainClient("localhost", INFO_PORT, 0.05f, new HvlGameInfo(INFO_GAME, INFO_VERSION, INFO_PORT));
+		//new MainClient("73.140.238.157", INFO_PORT, 0.05f, new HvlGameInfo(INFO_GAME, INFO_VERSION, INFO_PORT));
 		new MainServer("localhost", INFO_PORT, 0.05f, new HvlGameInfo(INFO_GAME, INFO_VERSION, INFO_PORT));
 	}
 
