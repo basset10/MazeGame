@@ -18,93 +18,73 @@ public class Player {
 	
 	public HvlCoord2D impartedMomentum = new HvlCoord2D();
 	
-	private float x;
-	private float y;
-	private float xSpeed;
-	private float ySpeed;
+	public HvlCoord2D pos;
+	public HvlCoord2D speed;
 	
 	public Player(float xArg, float yArg) {
 		
-		x = xArg;
-		y = yArg;
+		pos = new HvlCoord2D(500, 500);
+		speed = new HvlCoord2D();
 		
 	}
 	
 	public void draw(float delta) {
-		hvlDrawQuadc(x, y, PLAYER_SIZE, PLAYER_SIZE, Color.blue);
+		hvlDrawQuadc(pos.x, pos.y, PLAYER_SIZE, PLAYER_SIZE, Color.blue);
 	}
 
 	public void update(float delta) {
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			
-			ySpeed = ySpeed - (delta * ACCELERATION);
+			speed.y = speed.y - (delta * ACCELERATION);
 			
 		}else if(Keyboard.isKeyDown(Keyboard.KEY_S)) {
 			
-			ySpeed = ySpeed + (delta * ACCELERATION);
+			speed.y = speed.y + (delta * ACCELERATION);
 			
 		}else {
 			
-			ySpeed = HvlMath.stepTowards(ySpeed, ACCELERATION * delta, 0);
+			speed.y = HvlMath.stepTowards(speed.y, ACCELERATION * delta, 0);
 			
 		}
 
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
 			
-			xSpeed = xSpeed - (delta * ACCELERATION);
+			speed.x = speed.x - (delta * ACCELERATION);
 			
 		}else if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
 			
-			xSpeed = xSpeed + (delta * ACCELERATION);
+			speed.x = speed.x + (delta * ACCELERATION);
 			
 		}else {
 			
-			xSpeed = HvlMath.stepTowards(xSpeed, ACCELERATION * delta, 0);
+			speed.x = HvlMath.stepTowards(speed.x, ACCELERATION * delta, 0);
 			
 		}
 
-		x = x + (xSpeed * delta);
-		y = y + (ySpeed * delta);
+		pos.x = pos.x + (speed.x * delta);
+		pos.y = pos.y + (speed.y * delta);
 		
-		if(xSpeed >= MAX_SPEED) {
-			xSpeed = MAX_SPEED;
+		if(speed.x >= MAX_SPEED) {
+			speed.x = MAX_SPEED;
 		}
 		
-		if(xSpeed <= -MAX_SPEED) {
-			xSpeed = -MAX_SPEED;
+		if(speed.x <= -MAX_SPEED) {
+			speed.x = -MAX_SPEED;
 		}
 		
-		if(ySpeed >= MAX_SPEED) {
-			ySpeed = MAX_SPEED;
+		if(speed.y >= MAX_SPEED) {
+			speed.y = MAX_SPEED;
 		}
 		
-		if(ySpeed <= -MAX_SPEED) {
-			ySpeed = -MAX_SPEED;
+		if(speed.y <= -MAX_SPEED) {
+			speed.y = -MAX_SPEED;
 		}
 		
-		y = HvlMath.limit(y, PLAYER_SIZE/2, MAX_LENGTH - (PLAYER_SIZE/2));
-		x = HvlMath.limit(x, PLAYER_SIZE/2, MAX_WIDTH - (PLAYER_SIZE/2));
+		pos.y = HvlMath.limit(pos.y, PLAYER_SIZE/2, MAX_LENGTH - (PLAYER_SIZE/2));
+		pos.x = HvlMath.limit(pos.x, PLAYER_SIZE/2, MAX_WIDTH - (PLAYER_SIZE/2));
 
 		
 	}
-	
-	
-	public float getY() {
-		return y;
-	}
-	
-	public void setY(float yArg) {
-		y = yArg;
-	}
-	
-	public float getX() {
-		return x;
-	}
-	
-	public void setX(float xArg) {
-		x = xArg;
-	}
-	
 	
 }
