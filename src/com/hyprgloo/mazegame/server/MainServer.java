@@ -86,13 +86,15 @@ public class MainServer extends HvlTemplateDGameServer2D{
 		}
 		if(getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
 			for(SocketWrapper s : getAuthenticatedUsers()){
-				ArrayList<HvlCoord2D> enemies = new ArrayList<>();
-				for(SocketWrapper s2 : getAuthenticatedUsers()){
-					if(s != s2){
-						enemies.add(getServer().getTable().<HvlCoord2D>getSValue(KC.key_UIDLocation(getUIDK(s2))));
+				if(getServer().getTable().getPopulation(KC.key_UIDLocation(getUIDK(s))) > 1){
+					ArrayList<HvlCoord2D> enemies = new ArrayList<>();
+					for(SocketWrapper s2 : getAuthenticatedUsers()){
+						if(s != s2){
+							enemies.add(getServer().getTable().<HvlCoord2D>getSValue(KC.key_UIDLocation(getUIDK(s2))));
+						}
 					}
+					getServer().setValue(KC.key_UIDEnemies(getUIDK(s)), enemies, false);
 				}
-				getServer().setValue(KC.key_UIDEnemies(getUIDK(s)), enemies, false);
 			}
 		}
 	}

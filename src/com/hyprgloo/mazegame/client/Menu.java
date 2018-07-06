@@ -138,7 +138,7 @@ public class Menu {
 
 	public static void onDisconnection(){
 		HvlMenu.setCurrent(main);
-		game = null;
+		g = null;
 		main.getFirstArrangerBox().getFirstOfType(HvlLabeledButton.class).setEnabled(true);
 	}
 
