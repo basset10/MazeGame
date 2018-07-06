@@ -83,6 +83,9 @@ public class MainServer extends HvlTemplateDGameServer2D{
 			getServer().setValue(KC.key_Gamestate(), GameState.RUNNING, false);
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 		}
+		if(getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
+			
+		}
 	}
 
 	@Override
