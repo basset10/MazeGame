@@ -10,6 +10,7 @@ import com.hyprgloo.mazegame.client.Menu;
 import com.osreboot.hvol.base.HvlGameInfo;
 import com.osreboot.hvol.base.HvlMetaServer.SocketWrapper;
 import com.osreboot.hvol.dgameserver.HvlTemplateDGameServer2D;
+import com.osreboot.ridhvl.HvlCoord2D;
 import com.osreboot.ridhvl.HvlMath;
 import com.osreboot.ridhvl.display.collection.HvlDisplayModeResizable;
 import com.osreboot.ridhvl.painter.painter2d.HvlFontPainter2D;
@@ -84,7 +85,15 @@ public class MainServer extends HvlTemplateDGameServer2D{
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 		}
 		if(getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
-			
+			for(SocketWrapper s : getAuthenticatedUsers()){
+				ArrayList<HvlCoord2D> enemies = new ArrayList<>();
+				for(SocketWrapper s2 : getAuthenticatedUsers()){
+					if(s != s2){
+						enemies.add(getServer().getTable().<HvlCoord2D>getSValue(KC.key_UIDLocation(getUIDK(s2))));
+					}
+				}
+				getServer().setValue(KC.key_UIDEnemies(getUIDK(s)), enemies, false);
+			}
 		}
 	}
 
