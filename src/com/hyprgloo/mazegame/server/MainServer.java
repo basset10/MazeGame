@@ -73,7 +73,7 @@ public class MainServer extends HvlTemplateDGameServer2D{
 		}
 		getServer().setValue(KC.key_Userlist(), dataList, false);
 
-		if(allReady && userCount > 1){
+		if(allReady && userCount > 1 && getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.LOBBY){
 			getServer().setValue(KC.key_Gamereadytimer(), HvlMath.stepTowards(getServer().getTable().<Float>getSValue(KC.key_Gamereadytimer()), delta, 0), false);
 		}else{
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
@@ -82,9 +82,6 @@ public class MainServer extends HvlTemplateDGameServer2D{
 				getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.LOBBY){
 			getServer().setValue(KC.key_Gamestate(), GameState.RUNNING, false);
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
-			for(SocketWrapper s : getAuthenticatedUsers()){
-				getServer().setValue(KC.key_UIDReady(getUIDK(s)), false, false);
-			}
 		}
 	}
 

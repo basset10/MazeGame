@@ -125,7 +125,10 @@ public class Menu {
 					MainClient.font.drawWord("[" + (u.ready ? "X" : " ") + "] " + u.name, 16, 256 + (++line * 48), u.color);
 				}
 			}
-			if(MainClient.getNewestInstance().getClient().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING) HvlMenu.setCurrent(game);
+			if(MainClient.getNewestInstance().getClient().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
+				HvlMenu.setCurrent(game);
+				ready = false;
+			}
 		}else if(HvlMenu.getCurrent() == game){
 			if(g == null) g = new Game();
 			g.update(delta);

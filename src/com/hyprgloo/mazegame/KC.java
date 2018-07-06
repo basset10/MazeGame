@@ -8,6 +8,7 @@ public class KC {
 	private static final HvlKey KEY_READY = new HvlKey("ready");
 	private static final HvlKey KEY_COLOR = new HvlKey("color");
 	private static final HvlKey KEY_ROLE = new HvlKey("role");
+	private static final HvlKey KEY_LOCATION = new HvlKey("location");
 	
 	private static final HvlKey KEY_GAME = new HvlKey("game");
 	private static final HvlKey KEY_USERLIST = new HvlKey("users");
@@ -40,6 +41,13 @@ public class KC {
 	 */
 	public static HvlKey key_UIDRole(HvlKey arg){
 		return arg.with(KEY_ROLE);
+	}
+	
+	/**
+	 * @return "[0].location"
+	 */
+	public static HvlKey key_UIDLocation(HvlKey arg){
+		return arg.with(KEY_LOCATION);
 	}
 	
 	/**
