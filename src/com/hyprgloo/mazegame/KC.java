@@ -12,6 +12,7 @@ public class KC {
 	private static final HvlKey KEY_GAME = new HvlKey("game");
 	private static final HvlKey KEY_USERLIST = new HvlKey("users");
 	private static final HvlKey KEY_GAMESTATE = new HvlKey("state");
+	private static final HvlKey KEY_GAMEREADYTIMER = new HvlKey("readytimer");
 	
 	/**
 	 * @return "[0].username"
@@ -53,6 +54,13 @@ public class KC {
 	 */
 	public static HvlKey key_Gamestate(){
 		return KEY_GAME.with(KEY_GAMESTATE);
+	}
+	
+	/**
+	 * @return "game.readytimer"
+	 */
+	public static HvlKey key_Gamereadytimer(){
+		return KEY_GAME.with(KEY_GAMEREADYTIMER);
 	}
 	
 }

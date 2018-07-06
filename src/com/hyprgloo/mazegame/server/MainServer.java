@@ -10,6 +10,7 @@ import com.hyprgloo.mazegame.client.Menu;
 import com.osreboot.hvol.base.HvlGameInfo;
 import com.osreboot.hvol.base.HvlMetaServer.SocketWrapper;
 import com.osreboot.hvol.dgameserver.HvlTemplateDGameServer2D;
+import com.osreboot.ridhvl.HvlMath;
 import com.osreboot.ridhvl.display.collection.HvlDisplayModeResizable;
 import com.osreboot.ridhvl.painter.painter2d.HvlFontPainter2D;
 
@@ -19,6 +20,13 @@ public class MainServer extends HvlTemplateDGameServer2D{
 
 	public static final int 
 	INDEX_FONT = 0;
+
+	public static final float
+	VALUE_READYTIMER = 5f;
+
+	public static enum GameState{
+		LOBBY, RUNNING
+	}
 
 	public MainServer(String ipArg, int portArg, float tickRateArg, HvlGameInfo gameInfoArg) {
 		super(144, 1280, 720, "MazeGame(Server) by HYPRGLOO", new HvlDisplayModeResizable(), ipArg, portArg, tickRateArg, gameInfoArg);
@@ -40,14 +48,19 @@ public class MainServer extends HvlTemplateDGameServer2D{
 		Menu.initialize();
 
 		getServer().setValue(KC.key_Userlist(), new ArrayList<>(), false);
+		getServer().setValue(KC.key_Gamestate(), GameState.LOBBY, false);
+		getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 	}
 
 	@Override
 	public void update(float delta){
 		if(DEBUG) font.drawWord(getNewestInstance().getServer().getTable().toString(), 0, 0, Color.white, 0.5f);
 
+		boolean allReady = true;
+		int userCount = 0;
 		ArrayList<UserData> dataList = new ArrayList<>();
 		for(SocketWrapper s : getAuthenticatedUsers()){
+			userCount++;
 			if(getServer().getTable().getPopulation(KC.key_UIDUsername(getUIDK(s))) > 0){
 				String name = getServer().getTable().<String>getSValue(KC.key_UIDUsername(getUIDK(s)));
 				boolean ready = getServer().getTable().<Boolean>getSValue(KC.key_UIDReady(getUIDK(s)));
@@ -55,14 +68,31 @@ public class MainServer extends HvlTemplateDGameServer2D{
 				UserData data = new UserData(name, ready, color);
 				users.put(s, data);
 				dataList.add(data);
+				if(!ready) allReady = false;
 			}
 		}
 		getServer().setValue(KC.key_Userlist(), dataList, false);
+
+		if(allReady && userCount > 1){
+			getServer().setValue(KC.key_Gamereadytimer(), HvlMath.stepTowards(getServer().getTable().<Float>getSValue(KC.key_Gamereadytimer()), delta, 0), false);
+		}else{
+			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
+		}
+		if(getServer().getTable().<Float>getSValue(KC.key_Gamereadytimer()) == 0 && 
+				getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.LOBBY){
+			getServer().setValue(KC.key_Gamestate(), GameState.RUNNING, false);
+			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
+			for(SocketWrapper s : getAuthenticatedUsers()){
+				getServer().setValue(KC.key_UIDReady(getUIDK(s)), false, false);
+			}
+		}
 	}
 
 	@Override
 	public void onConnection(SocketWrapper target){
 		getServer().addMember(target, KC.key_Userlist());
+		getServer().addMember(target, KC.key_Gamestate());
+		getServer().addMember(target, KC.key_Gamereadytimer());
 	}
 
 	@Override

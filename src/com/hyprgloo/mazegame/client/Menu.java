@@ -9,6 +9,7 @@ import org.newdawn.slick.Color;
 
 import com.hyprgloo.mazegame.KC;
 import com.hyprgloo.mazegame.server.UserData;
+import com.hyprgloo.mazegame.server.MainServer.GameState;
 import com.osreboot.hvol.base.HvlConnectorClient;
 import com.osreboot.ridhvl.HvlMath;
 import com.osreboot.ridhvl.action.HvlAction1;
@@ -96,7 +97,7 @@ public class Menu {
 		
 		game = new HvlMenu();
 
-		HvlMenu.setCurrent(game);
+		HvlMenu.setCurrent(main);
 	}
 
 	public static void update(float delta){
@@ -124,6 +125,7 @@ public class Menu {
 					MainClient.font.drawWord("[" + (u.ready ? "X" : " ") + "] " + u.name, 16, 256 + (++line * 48), u.color);
 				}
 			}
+			if(MainClient.getNewestInstance().getClient().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING) HvlMenu.setCurrent(game);
 		}else if(HvlMenu.getCurrent() == game){
 			if(g == null) g = new Game();
 			g.update(delta);
@@ -133,6 +135,7 @@ public class Menu {
 
 	public static void onDisconnection(){
 		HvlMenu.setCurrent(main);
+		game = null;
 		main.getFirstArrangerBox().getFirstOfType(HvlLabeledButton.class).setEnabled(true);
 	}
 
