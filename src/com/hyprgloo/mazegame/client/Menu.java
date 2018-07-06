@@ -24,9 +24,10 @@ import com.osreboot.ridhvl.menu.component.collection.HvlLabeledButton;
 
 public class Menu {
 
-	public static HvlMenu main, lobby;
+	public static HvlMenu main, lobby, game;
 	public static String username = "GenericUsername";
 	public static Boolean ready = false;
+	public static Game g;
 
 	public static void initialize(){
 		HvlComponentDefault.setDefault(new HvlArrangerBox(Display.getWidth(), Display.getHeight(), HvlArrangerBox.ArrangementStyle.VERTICAL));
@@ -92,8 +93,10 @@ public class Menu {
 				ready = !ready;
 			}
 		}).build());
+		
+		game = new HvlMenu();
 
-		HvlMenu.setCurrent(main);
+		HvlMenu.setCurrent(game);
 	}
 
 	public static void update(float delta){
@@ -121,6 +124,9 @@ public class Menu {
 					MainClient.font.drawWord("[" + (u.ready ? "X" : " ") + "] " + u.name, 16, 256 + (++line * 48), u.color);
 				}
 			}
+		}else if(HvlMenu.getCurrent() == game){
+			if(g == null) g = new Game();
+			g.update(delta);
 		}
 		HvlMenu.updateMenus(delta);
 	}
