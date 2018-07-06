@@ -114,7 +114,7 @@ public class Menu {
 			float line = 0;
 			client.setValue(KC.key_UIDReady(MainClient.getNewestInstance().getUIDK()), ready, false);
 			client.setValue(KC.key_UIDColor(MainClient.getNewestInstance().getUIDK()), 
-					username.equalsIgnoreCase("os_reboot") ? new Color(0f, 0f, HvlMath.map((float)Math.sin(5f * MainClient.getNewestInstance().getTimer().getTotalTime()), -1f, 1f, 0.5f, 1f)) : Color.white, 
+					username.equalsIgnoreCase("os_reboot") ? new Color(0f, 0f, HvlMath.map((float)Math.sin(5f * MainClient.getNewestInstance().getTimer().getTotalTime()), -1f, 1f, 0.5f, 1f)) : Color.orange, 
 							false);
 			if(client.getTable().getPopulation(KC.key_Userlist()) > 0){
 				for(UserData u : client.<ArrayList<UserData>>getValue(KC.key_Userlist())){

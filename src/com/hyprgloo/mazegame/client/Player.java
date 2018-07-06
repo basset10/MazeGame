@@ -3,6 +3,7 @@ package com.hyprgloo.mazegame.client;
 import static com.osreboot.ridhvl.painter.painter2d.HvlPainter2D.hvlDrawQuadc;
 
 import org.lwjgl.input.Keyboard;
+import org.newdawn.slick.Color;
 
 public class Player {
 
@@ -19,7 +20,7 @@ public class Player {
 	}
 	
 	public void draw(float delta) {
-		hvlDrawQuadc(x, y, PLAYER_SIZE, PLAYER_SIZE, org.newdawn.slick.Color.blue);
+		hvlDrawQuadc(x, y, PLAYER_SIZE, PLAYER_SIZE, Color.blue);
 	}
 
 	public void update(float delta) {
@@ -28,13 +29,13 @@ public class Player {
 		if(Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			y = y - 10;
 		}else if(Keyboard.isKeyDown(Keyboard.KEY_S)) {
-			y = y + 10;;
+			y = y + 10;
 		}
 		
 		if(Keyboard.isKeyDown(Keyboard.KEY_A)) {
 			x = x - 10;
 		}else if(Keyboard.isKeyDown(Keyboard.KEY_D)) {
-			x = x + 10;;
+			x = x + 10;
 		}
 		
 	}
