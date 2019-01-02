@@ -2,15 +2,13 @@ package com.hyprgloo.mazegame.client;
 
 import static com.osreboot.ridhvl.painter.painter2d.HvlPainter2D.hvlDrawQuad;
 
-import java.util.ArrayList;
-
 import org.lwjgl.opengl.Display;
 import org.newdawn.slick.Color;
 
 import com.hyprgloo.mazegame.KC;
-import com.hyprgloo.mazegame.server.UserData;
 import com.hyprgloo.mazegame.server.MainServer.GameState;
 import com.osreboot.hvol.base.HvlConnectorClient;
+import com.osreboot.hvol.base.HvlKey;
 import com.osreboot.ridhvl.HvlMath;
 import com.osreboot.ridhvl.action.HvlAction1;
 import com.osreboot.ridhvl.menu.HvlComponentDefault;
@@ -74,10 +72,10 @@ public class Menu {
 			@Override
 			public void run(HvlButton aArg){
 				try{	
-					if(!MainClient.getNewestInstance().getClient().isConnected()){
-						MainClient.getNewestInstance().getClient().start();
+					if(!MainClient.getNClient().isConnected()){
+						MainClient.getNClient().start();
 					}
-					if(MainClient.getNewestInstance().getClient().isConnected()){
+					if(MainClient.getNClient().isConnected()){
 						aArg.setEnabled(false);
 					}
 				}catch(Exception e){
@@ -94,38 +92,41 @@ public class Menu {
 				ready = !ready;
 			}
 		}).build());
-		
+
 		game = new HvlMenu();
 
 		HvlMenu.setCurrent(main);
 	}
 
 	public static void update(float delta){
-		HvlConnectorClient client = MainClient.getNewestInstance().getClient();
+		HvlConnectorClient client = MainClient.getNClient();
 		main.getFirstArrangerBox().getFirstOfType(HvlLabeledButton.class).setEnabled(
 				main.getFirstArrangerBox().getFirstOfType(HvlTextBox.class).getText().length() > 4);
 		username = main.getFirstArrangerBox().getFirstOfType(HvlTextBox.class).getText();
 		if(HvlMenu.getCurrent() == main){
 			if(MainClient.getNewestInstance().isAuthenticated()){
 				ready = false;
-				client.setValue(KC.key_UIDUsername(MainClient.getNewestInstance().getUIDK()), username, false);
-				client.setValue(KC.key_UIDColor(MainClient.getNewestInstance().getUIDK()), username.equals("os_reboot") ? Color.blue : Color.white, false);
-				client.setValue(KC.key_UIDReady(MainClient.getNewestInstance().getUIDK()), false, false);
+				client.setValue(KC.key_UIDUsername(MainClient.getNUIDK()), username, false);
+				client.setValue(KC.key_UIDColor(MainClient.getNUIDK()), username.equals("os_reboot") ? Color.blue : Color.white, false);
+				client.setValue(KC.key_UIDReady(MainClient.getNUIDK()), false, false);
 				HvlMenu.setCurrent(lobby);
 			}
 		}else if(HvlMenu.getCurrent() == lobby){
 			MainClient.font.drawWord("Users:", 16, 256, Color.white);
 			float line = 0;
-			client.setValue(KC.key_UIDReady(MainClient.getNewestInstance().getUIDK()), ready, false);
-			client.setValue(KC.key_UIDColor(MainClient.getNewestInstance().getUIDK()), 
+			client.setValue(KC.key_UIDReady(MainClient.getNUIDK()), ready, false);
+			client.setValue(KC.key_UIDColor(MainClient.getNUIDK()), 
 					username.equalsIgnoreCase("os_reboot") ? new Color(0f, 0f, HvlMath.map((float)Math.sin(5f * MainClient.getNewestInstance().getTimer().getTotalTime()), -1f, 1f, 0.5f, 1f)) : Color.orange, 
 							false);
-			if(client.getTable().getPopulation(KC.key_Userlist()) > 0){
-				for(UserData u : client.<ArrayList<UserData>>getValue(KC.key_Userlist())){
-					MainClient.font.drawWord("[" + (u.ready ? "X" : " ") + "] " + u.name, 16, 256 + (++line * 48), u.color);
-				}
+			for(HvlKey k : client.getTable().getSKeys()){
+				try{
+					Integer.parseInt(k.toString());
+					HvlKey uid = new HvlKey(k.getElements()[0]);
+					MainClient.font.drawWord("[" + (client.<Boolean>getValue(KC.key_UIDReady(uid)) ? "X" : " ") + "] " + client.<String>getValue(KC.key_UIDUsername(uid)), 16, 256 + (++line * 48), client.<Color>getValue(KC.key_UIDColor(uid)));
+				}catch(Exception e){}
+				
 			}
-			if(MainClient.getNewestInstance().getClient().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
+			if(client.<GameState>getValue(KC.key_Gamestate()) == GameState.RUNNING){
 				HvlMenu.setCurrent(game);
 				ready = false;
 			}

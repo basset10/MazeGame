@@ -1,7 +1,6 @@
 package com.hyprgloo.mazegame.server;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import org.newdawn.slick.Color;
 
@@ -34,7 +33,6 @@ public class MainServer extends HvlTemplateDGameServer2D{
 	}
 
 	public static HvlFontPainter2D font;
-	public static HashMap<SocketWrapper, UserData> users;
 
 	@Override
 	public void initialize(){
@@ -44,53 +42,42 @@ public class MainServer extends HvlTemplateDGameServer2D{
 		font.setCharSpacing(16f);
 		font.setScale(0.25f);
 
-		users = new HashMap<>();
-
 		Menu.initialize();
 
-		getServer().setValue(KC.key_Userlist(), new ArrayList<>(), false);
 		getServer().setValue(KC.key_Gamestate(), GameState.LOBBY, false);
 		getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 	}
 
 	@Override
 	public void update(float delta){
-		if(DEBUG) font.drawWord(getNewestInstance().getServer().getTable().toString(), 0, 0, Color.white, 0.5f);
+		if(DEBUG) font.drawWord(getServer().getTable().toString(), 0, 0, Color.white, 0.5f);
 
 		boolean allReady = true;
 		int userCount = 0;
-		ArrayList<UserData> dataList = new ArrayList<>();
 		for(SocketWrapper s : getAuthenticatedUsers()){
 			userCount++;
-			if(getServer().getTable().getPopulation(KC.key_UIDUsername(getUIDK(s))) > 0){
-				String name = getServer().getTable().<String>getSValue(KC.key_UIDUsername(getUIDK(s)));
-				boolean ready = getServer().getTable().<Boolean>getSValue(KC.key_UIDReady(getUIDK(s)));
-				Color color = getServer().getTable().<Color>getSValue(KC.key_UIDColor(getUIDK(s)));
-				UserData data = new UserData(name, ready, color);
-				users.put(s, data);
-				dataList.add(data);
-				if(!ready) allReady = false;
+			if(getServer().hasValue(KC.key_UIDUsername(getUIDK(s)))){
+				if(!getServer().<Boolean>getValue(KC.key_UIDReady(getUIDK(s)))) allReady = false;
 			}
 		}
-		getServer().setValue(KC.key_Userlist(), dataList, false);
 
-		if(allReady && userCount > 1 && getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.LOBBY){
-			getServer().setValue(KC.key_Gamereadytimer(), HvlMath.stepTowards(getServer().getTable().<Float>getSValue(KC.key_Gamereadytimer()), delta, 0), false);
+		if(allReady && userCount > 1 && getServer().<GameState>getValue(KC.key_Gamestate()) == GameState.LOBBY){
+			getServer().setValue(KC.key_Gamereadytimer(), HvlMath.stepTowards(getServer().<Float>getValue(KC.key_Gamereadytimer()), delta, 0), false);
 		}else{
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 		}
-		if(getServer().getTable().<Float>getSValue(KC.key_Gamereadytimer()) == 0 && 
-				getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.LOBBY){
+		if(getServer().<Float>getValue(KC.key_Gamereadytimer()) == 0 && 
+				getServer().<GameState>getValue(KC.key_Gamestate()) == GameState.LOBBY){
 			getServer().setValue(KC.key_Gamestate(), GameState.RUNNING, false);
 			getServer().setValue(KC.key_Gamereadytimer(), VALUE_READYTIMER, false);
 		}
-		if(getServer().getTable().<GameState>getSValue(KC.key_Gamestate()) == GameState.RUNNING){
+		if(getServer().<GameState>getValue(KC.key_Gamestate()) == GameState.RUNNING){
 			for(SocketWrapper s : getAuthenticatedUsers()){
-				if(getServer().getTable().getPopulation(KC.key_UIDLocation(getUIDK(s))) > 0){
-					ArrayList<LocationData> enemies = new ArrayList<>();
+				if(getServer().hasValue(KC.key_UIDLocation(getUIDK(s)))){
+					ArrayList<HvlCoord2D> enemies = new ArrayList<>();
 					for(SocketWrapper s2 : getAuthenticatedUsers()){
-						if(s != s2 && getServer().getTable().getPopulation(KC.key_UIDLocation(getUIDK(s2))) > 0){
-							enemies.add(new LocationData(getServer().getTable().<HvlCoord2D>getSValue(KC.key_UIDLocation(getUIDK(s2))), users.get(s2)));
+						if(s != s2 && getServer().hasValue(KC.key_UIDLocation(getUIDK(s2)))){
+							enemies.add(getServer().<HvlCoord2D>getValue(KC.key_UIDLocation(getUIDK(s2))));
 						}
 					}
 					getServer().setValue(KC.key_UIDEnemies(getUIDK(s)), enemies, false);
@@ -101,16 +88,19 @@ public class MainServer extends HvlTemplateDGameServer2D{
 
 	@Override
 	public void onConnection(SocketWrapper target){
-		getServer().addMember(target, KC.key_Userlist());
 		getServer().addMember(target, KC.key_Gamestate());
 		getServer().addMember(target, KC.key_Gamereadytimer());
+		for(SocketWrapper s : getAuthenticatedUsers()){
+			if(target != s){
+				getServer().addMember(target, KC.key_UIDInfo(getUIDK(s)));
+				getServer().addMember(s, KC.key_UIDInfo(getUIDK(target)));
+			}
+		}
 	}
 
 	@Override
 	public void onDisconnection(SocketWrapper target){
-		ArrayList<UserData> dataList = new ArrayList<>(getServer().getTable().<ArrayList<UserData>>getSValue(KC.key_Userlist()));
-		dataList.remove(users.get(target));
-		getServer().setValue(KC.key_Userlist(), dataList, false);
+		
 	}
 
 }
